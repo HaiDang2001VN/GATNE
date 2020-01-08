@@ -1,0 +1,1 @@
+python src/main.py --input data/anomaly --schema u-b-u,b-u-b,u-p-u,p-u-p,u-c-u,c-u-c,u-i-u,i-u-i,u-s-u,s-u-s --model_path ./models/anomaly

@@ -1,5 +1,7 @@
 import argparse
 from collections import defaultdict
+import pickle
+import os
 
 import networkx as nx
 import numpy as np
@@ -59,6 +61,8 @@ def parse_args():
     parser.add_argument('--patience', type=int, default=5,
                         help='Early stopping patience. Default is 5.')
     
+    parser.add_argument('--model_path', type=str,
+                        help='model path')
     return parser.parse_args()
 
 def get_G_from_edges(edges):
@@ -139,7 +143,8 @@ def generate_walks(network_data, num_walks, walk_length, schema, file_name):
         tmp_data = network_data[layer_id]
         # start to do the random walk on a layer
 
-        layer_walker = RWGraph(get_G_from_edges(tmp_data))
+        print('start to do the random walk on a layer: %s/%s' % (layer_id,len(network_data)))
+        layer_walker = RWGraph(get_G_from_edges(tmp_data), node_type=node_type)
         layer_walks = layer_walker.simulate_walks(num_walks, walk_length, schema=schema)
 
         all_walks.append(layer_walks)
@@ -220,3 +225,29 @@ def evaluate(model, true_edges, false_edges):
     y_scores = np.array(prediction_list)
     ps, rs, _ = precision_recall_curve(y_true, y_scores)
     return roc_auc_score(y_true, y_scores), f1_score(y_true, y_pred), auc(rs, ps)
+
+def save_walks(walks, dir):
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+    with open(os.path.join(dir,'walks.pkl'),'wb') as f:
+        pickle.dump(walks,f)
+
+def load_walks(dir):
+    file = os.path.join(dir,'walks.pkl')
+    if not os.path.exists(file):
+        return None
+    with open(file,'rb') as f:
+        return pickle.load(f)
+
+def save_vocab(vocab, index2word, dir):
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+    with open(os.path.join(dir,'vocab.pkl'),'wb') as f:
+        pickle.dump(vocab,f)
+    with open(os.path.join(dir,'index.pkl'),'wb') as f:
+        pickle.dump(index2word,f)
+def save_embeddings(embeddings,dir):
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+    with open(os.path.join(dir,'embedding.pkl'),'wb') as f:
+        pickle.dump(embeddings,f)
