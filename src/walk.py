@@ -2,7 +2,7 @@ import random
 
 import networkx as nx
 import numpy as np
-
+from tqdm import tqdm
 
 class RWGraph():
     def __init__(self, nx_G, node_type=None):
@@ -39,14 +39,16 @@ class RWGraph():
         # print('Walk iteration:')
         if schema is not None:
             schema_list = schema.split(',')
-        for walk_iter in range(num_walks):
-            random.shuffle(nodes)
-            for node in nodes:
-                if schema is None:
-                    walks.append(self.walk(walk_length=walk_length, start=node))
-                else:
-                    for schema_iter in schema_list:
-                        if schema_iter.split('-')[0] == self.node_type[node]:
-                            walks.append(self.walk(walk_length=walk_length, start=node, schema=schema_iter))
+        with tqdm(total=num_walks) as bar:
+            for walk_iter in range(num_walks):
+                random.shuffle(nodes)
+                for node in nodes:
+                    if schema is None:
+                        walks.append(self.walk(walk_length=walk_length, start=node))
+                    else:
+                        for schema_iter in schema_list:
+                            if schema_iter.split('-')[0] == self.node_type[node]:
+                                walks.append(self.walk(walk_length=walk_length, start=node, schema=schema_iter))
+                bar.update()
 
         return walks
