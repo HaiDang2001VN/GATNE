@@ -132,9 +132,15 @@ class NSLoss(nn.Module):
 
 
 def train_model(network_data):
-    all_walks = generate_walks(network_data, args.num_walks, args.walk_length, args.schema, file_name)
+    model_path = args.model_path
+    all_walks = load_walks(model_path)
+    if all_walks is None:
+        all_walks = generate_walks(network_data, args.num_walks, args.walk_length, args.schema, file_name)
+        save_walks(all_walks, model_path)
+
     vocab, index2word = generate_vocab(all_walks)
     train_pairs = generate_pairs(all_walks, vocab, args.window_size)
+    save_vocab(vocab,index2word,model_path)
 
     edge_types = list(network_data.keys())
 
@@ -267,6 +273,7 @@ def train_model(network_data):
         if cur_score > best_score:
             best_score = cur_score
             patience = 0
+            save_embeddings(final_model, model_path)
         else:
             patience += 1
             if patience > args.patience:

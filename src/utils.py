@@ -132,7 +132,7 @@ def load_node_type(f_name):
             node_type[items[0]] = items[1]
     return node_type
 
-def generate_walks(network_data, num_walks, walk_length, schema, file_name):
+def _generate_walks(network_data, num_walks, walk_length, schema, file_name):
     if schema is not None:
         node_type = load_node_type(file_name + '/node_type.txt')
     else:
@@ -151,6 +151,17 @@ def generate_walks(network_data, num_walks, walk_length, schema, file_name):
 
     print('Finish generating the walks')
 
+    return all_walks
+
+def generate_walks(network_data, num_walks, walk_length, schema, file_name):
+    if schema is not None:
+        node_type = load_node_type(file_name + '/node_type.txt')
+    else:
+        node_type = None
+    from walker import Walker
+    walker = Walker(network_data,num_walks,walk_length,schema,node_type)
+    all_walks = walker.walk()
+    print('Finish generating the walks')
     return all_walks
 
 def generate_pairs(all_walks, vocab, window_size):
