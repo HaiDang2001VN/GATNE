@@ -184,7 +184,7 @@ def train_model(network_data, feature_dic, log_name):
 
                 avg_loss += loss_value
 
-                if i % 5000 == 0:
+                if i % 1000 == 0:
                     post_fix = {
                         "epoch": epoch,
                         "iter": i,
